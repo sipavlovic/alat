@@ -1,2 +1,2 @@
 # alat
-Webassembly package for building business oriented user interfaces
+Webassembly package in Go for building business oriented user interfaces
