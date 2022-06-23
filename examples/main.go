@@ -10,6 +10,7 @@ import (
 	"github.com/sipavlovic/alat"
 	"syscall/js"
 	"fmt"
+	"strconv"
 )
 
 func MakeCSS() {
@@ -42,6 +43,15 @@ func MakeCSS() {
 }
 
 
+func ToInt(value string) (int,error) {
+	return strconv.Atoi(value)
+}
+func FromInt(value int) string {
+	return strconv.Itoa(value)
+}
+
+
+
 func main() {
 
 	MakeCSS()
@@ -50,20 +60,42 @@ func main() {
 	block := alat.NewBlock(body)
 	container := alat.NewContainer(block,nil) 
 	alat.NewLabel(block,container,"Enter username:")
-	alat.NewEdit(block,container)
+	w_usr := alat.NewEdit(block,container)
 	alat.NewLabel(block,container,"Enter password:")
-	alat.NewEdit(block,container)
+	w_pwd := alat.NewEdit(block,container)
 	alat.NewLabel(block,container,"Table:")
 	table := alat.NewTable(block,container,6)
-	table.AddColumn("One")
-	table.AddColumn("Two")
-	table.AddColumn("Three")
-	table.AddColumn("Four")
-	table.AddColumn("Five")
-	table.AddColumn("Six")
-
+	col_one := table.AddColumn("One")
+	col_two := table.AddColumn("Two")
+	col_three := table.AddColumn("Three")
+	col_four := table.AddColumn("Four")
+	col_five := table.AddColumn("Five")
+	col_six := table.AddColumn("Six")
 	alat.NewButton(block,container,"Click on me!")
 
+	block.Connect(w_usr,"USERNAME")
+	block.Connect(w_pwd,"PASSWORD")
+	block.Connect(col_one,"ONE")
+	block.Connect(col_two,"TWO")
+	block.Connect(col_three,"THREE")
+	block.Connect(col_four,"FOUR")
+	block.Connect(col_five,"FIVE")
+	block.Connect(col_six,"SIX")
+	
+	buff := block.Buffer()
+	for i:=1;i<=10;i++ {
+		buff.InsertRow()
+		buff.Set("ID",FromInt(i))
+		buff.Set("USERNAME","User-"+FromInt(i))
+		buff.Set("PASSWORD","Pwd-"+FromInt(i))
+		buff.Set("ONE","One-"+FromInt(i))
+		buff.Set("TWO","Two-"+FromInt(i))
+		buff.Set("THREE","Three-"+FromInt(i))
+		buff.Set("FOUR","Four-"+FromInt(i))
+		buff.Set("FIVE","Five-"+FromInt(i))
+		buff.Set("SIX","Six-"+FromInt(i))
+	}
+	fmt.Println("Buffer:",buff)
 
 	block.Draw()
 	fmt.Println("End defining.")

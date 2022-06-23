@@ -3,7 +3,9 @@
   TODO 
 ========
 
-
+*) Show buffer values in widgets
+*) Make change events and updating buffer values
+*) Make focus control infrastructure
 
 
 ========
@@ -17,4 +19,7 @@
 2022-06-20) Create table and column widgets
 2022-06-20) Create buffer
 2022-06-20) Create block
+2022-06-23) Write buffer methods
+2022-06-23) Add constant NOROW
+2022-06-23) Make connections between widgets and buffer
 

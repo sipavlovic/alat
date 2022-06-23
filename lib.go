@@ -12,6 +12,9 @@ func NewNode(parent js.Value, nodeType string) js.Value {
 	return node
 }
 
+
 func ClearNode(node js.Value) {
 	node.Set("textContent","")
 }
+
+
