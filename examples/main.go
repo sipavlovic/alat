@@ -83,7 +83,7 @@ func main() {
 	block.Connect(col_six,"SIX")
 	
 	buff := block.Buffer()
-	for i:=1;i<=10;i++ {
+	for i:=1;i<=30;i++ {
 		buff.InsertRow()
 		buff.Set("ID",FromInt(i))
 		buff.Set("USERNAME","User-"+FromInt(i))
@@ -98,6 +98,7 @@ func main() {
 	fmt.Println("Buffer:",buff)
 
 	block.Draw()
+	block.Refresh()
 	fmt.Println("End defining.")
 
 	<-make(chan struct{})

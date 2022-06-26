@@ -16,3 +16,13 @@ func (w *Edit) Draw() {
 	w.htmlObject = input
 	w.BaseWidget.Draw()
 }
+
+func (w *Edit) Refresh() {
+	result := ""
+	if column,ok := w.Block().widgetsToColumns[w]; ok {
+		result,_ = w.Block().Buffer().Get(column)
+	}
+	w.HTMLObject().Set("value",result)
+	w.BaseWidget.Refresh()
+}
+

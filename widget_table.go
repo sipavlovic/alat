@@ -2,6 +2,7 @@ package alat
 
 import (
 	"syscall/js"
+	"strconv"
 )
 
 type Table struct {
@@ -40,7 +41,7 @@ func (w *Table) Draw() {
 
 func (w *Table) DrawContent() {
 	ClearNode(w.tableObj)
-	//obj.viewBegin, obj.viewEnd = obj.block.Buffer.CalcView(obj.viewBegin, obj.viewEnd, obj.viewRows)
+	w.viewBegin, w.viewEnd = w.Block().Buffer().CalcView(w.viewBegin, w.viewEnd, w.visibleRows)
 	tr := NewNode(w.tableObj,"tr")
 	for _,col := range w.columns {
 		th := NewNode(tr,"th")
@@ -53,14 +54,52 @@ func (w *Table) DrawContent() {
 
 
 func (w *Table) DrawRow(rownum int) {
+	bufferRow := w.viewBegin+rownum
 	rowtr := NewNode(w.tableObj,"tr")
-	for range w.columns {
-		rowtd := NewNode(rowtr,"td")
-		NewNode(rowtd,"input")
+	if bufferRow>=0 && bufferRow<=w.viewEnd {
+		for _,columnWidget := range w.columns {
+			rowtd := NewNode(rowtr,"td")
+			input := NewNode(rowtd,"input")
+			column := w.Block().widgetsToColumns[columnWidget]
+			value,_ := w.Block().Buffer().GetAt(bufferRow,column)
+			input.Set("value", value)
+		}
+	} else {
+		for range w.columns {
+			rowtd := NewNode(rowtr,"td")
+			rowtd.Set("style","background-color: #CCC")
+		}
 	}
 }
 
 
+func (w *Table) Cell(colnum int, rownum int) js.Value {
+	tr := w.tableObj.Get("children").Get(strconv.Itoa(rownum+1))
+	td := tr.Get("children").Get(strconv.Itoa(colnum))
+	return td.Get("children").Get("0")
+}
+
+func (w *Table) ViewRow2BufferPos(viewRow int) (int, bool) {
+	if viewRow>=0 && viewRow<w.visibleRows {
+		buffer := w.Block().Buffer()
+		bufferPos := viewRow+w.viewBegin
+		if bufferPos>=0 && bufferPos<len(buffer.rows) {
+			return bufferPos,true
+		}
+	}
+	return 0,false
+}
+
+func (w *Table) BufferPos2ViewRow(bufferPos int) (int, bool) {
+	buffer := w.Block().Buffer()
+	if bufferPos>=0 && bufferPos<len(buffer.rows) {
+		viewRow := bufferPos-w.viewBegin
+		if viewRow>=0 && viewRow<w.visibleRows {
+			return viewRow,true
+		}
+	}
+	return 0,false
+}
 
 
 
