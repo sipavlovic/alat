@@ -43,6 +43,7 @@ func (b *Block) Draw() {
 	for _,widget := range b.widgets {
 		widget.Draw()
 	}
+	b.FirstWidget().SetFocus()
 }
 
 

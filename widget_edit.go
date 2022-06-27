@@ -1,6 +1,7 @@
 
 package alat
 
+
 type Edit struct {
 	BaseWidget
 }
@@ -8,6 +9,7 @@ type Edit struct {
 func NewEdit(block *Block, parentWidget Widget) *Edit {
 	var edit Edit
 	edit.BaseWidget.Init(block, &edit, parentWidget)
+	block.AddToFocusList(&edit)
 	return &edit
 }
 
@@ -15,6 +17,8 @@ func (w *Edit) Draw() {
 	input := NewNode(w.ParentHTMLObject(),"input")
 	w.htmlObject = input
 	w.BaseWidget.Draw()
+	AttachOnChangeEvent(w,input,NOTINTABLE)
+	AttachFocusEvents(w,input,NOTINTABLE)
 }
 
 func (w *Edit) Refresh() {
@@ -26,3 +30,6 @@ func (w *Edit) Refresh() {
 	w.BaseWidget.Refresh()
 }
 
+func (w *Edit) SetFocus() {
+	w.HTMLObject().Call("focus")
+}

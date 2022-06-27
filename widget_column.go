@@ -16,3 +16,7 @@ func (w *Column) HTMLObject() js.Value {
 	viewRow,_ := table.BufferPos2ViewRow(buffer.pos)
 	return table.Cell(w.index,viewRow)
 }
+
+func (w *Column) SetFocus() {
+	w.HTMLObject().Call("focus")
+}

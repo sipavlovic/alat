@@ -27,6 +27,7 @@ func (w *Table) AddColumn(label string) *Column {
 	col.label = label
 	w.columns = append(w.columns,&col)
 	col.index = len(w.columns)-1
+	w.Block().AddToFocusList(&col)
 	return &col
 }
 
@@ -38,6 +39,12 @@ func (w *Table) Draw() {
 	w.tableObj = NewNode(div,"table")
 	w.DrawContent()
 }
+
+
+func (w *Table) Refresh() {
+	w.DrawContent()
+}
+
 
 func (w *Table) DrawContent() {
 	ClearNode(w.tableObj)
@@ -63,6 +70,8 @@ func (w *Table) DrawRow(rownum int) {
 			column := w.Block().widgetsToColumns[columnWidget]
 			value,_ := w.Block().Buffer().GetAt(bufferRow,column)
 			input.Set("value", value)
+			AttachOnChangeEvent(columnWidget,input,rownum)
+			AttachFocusEvents(columnWidget,input,rownum)
 		}
 	} else {
 		for range w.columns {

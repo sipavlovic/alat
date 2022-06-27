@@ -3,9 +3,7 @@
   TODO 
 ========
 
-*) Make change events and updating buffer values
-*) Make focus control infrastructure
-
+*) BUG: onchange not working on edit widget when press up/down
 
 ========
   DONE 
@@ -22,3 +20,5 @@
 2022-06-23) Add constant NOROW
 2022-06-23) Make connections between widgets and buffer
 2022-06-27) Show buffer values in widgets
+2022-06-27) Make focus control infrastructure
+2022-06-27) Make change events and updating buffer values

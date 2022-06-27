@@ -71,7 +71,10 @@ func main() {
 	col_four := table.AddColumn("Four")
 	col_five := table.AddColumn("Five")
 	col_six := table.AddColumn("Six")
-	alat.NewButton(block,container,"Click on me!")
+	butt := alat.NewButton(block,container,"Click on me!")
+	butt.SetHandler(func(w *alat.Button) {
+		js.Global().Call("alert","Clicked!")
+	})
 
 	block.Connect(w_usr,"USERNAME")
 	block.Connect(w_pwd,"PASSWORD")
@@ -99,6 +102,7 @@ func main() {
 
 	block.Draw()
 	block.Refresh()
+	
 	fmt.Println("End defining.")
 
 	<-make(chan struct{})
