@@ -1,6 +1,11 @@
 
 package alat
 
+import (
+	"syscall/js"
+	"fmt"
+)
+
 
 type Edit struct {
 	BaseWidget
@@ -17,7 +22,6 @@ func (w *Edit) Draw() {
 	input := NewNode(w.ParentHTMLObject(),"input")
 	w.htmlObject = input
 	w.BaseWidget.Draw()
-	AttachOnChangeEvent(w,input,NOTINTABLE)
 	AttachFocusEvents(w,input,NOTINTABLE)
 }
 
@@ -32,4 +36,18 @@ func (w *Edit) Refresh() {
 
 func (w *Edit) SetFocus() {
 	w.HTMLObject().Call("focus")
+}
+
+func (w *Edit) WriteIfChanged(obj js.Value, rownum int) bool {
+	if column,ok := w.Block().widgetsToColumns[w]; ok {
+		buffer := w.Block().Buffer()
+		widgetValue := obj.Get("value").String()
+		bufferValue,_ := buffer.Get(column)
+		if widgetValue != bufferValue {
+			fmt.Println("New value for",column,"is",widgetValue)
+			buffer.Set(column,widgetValue)
+			return true
+		}
+	}
+	return false
 }

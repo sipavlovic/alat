@@ -3,7 +3,6 @@
   TODO 
 ========
 
-*) BUG: onchange not working on edit widget when press up/down
 
 ========
   DONE 
@@ -22,3 +21,5 @@
 2022-06-27) Show buffer values in widgets
 2022-06-27) Make focus control infrastructure
 2022-06-27) Make change events and updating buffer values
+2022-06-29) BUG: onchange not working on edit widget when press up/down
+2022-06-29) Show current line in table

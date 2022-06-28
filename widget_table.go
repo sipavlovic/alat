@@ -62,15 +62,19 @@ func (w *Table) DrawContent() {
 
 func (w *Table) DrawRow(rownum int) {
 	bufferRow := w.viewBegin+rownum
+	pos := w.Block().Buffer().pos
 	rowtr := NewNode(w.tableObj,"tr")
 	if bufferRow>=0 && bufferRow<=w.viewEnd {
 		for _,columnWidget := range w.columns {
 			rowtd := NewNode(rowtr,"td")
 			input := NewNode(rowtd,"input")
+			if bufferRow==pos {
+				rowtd.Set("style","background-color: #BCE5FD")
+				input.Set("style","background-color: #BCE5FD")
+			}
 			column := w.Block().widgetsToColumns[columnWidget]
 			value,_ := w.Block().Buffer().GetAt(bufferRow,column)
 			input.Set("value", value)
-			AttachOnChangeEvent(columnWidget,input,rownum)
 			AttachFocusEvents(columnWidget,input,rownum)
 		}
 	} else {

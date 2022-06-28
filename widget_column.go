@@ -2,6 +2,7 @@ package alat
 
 import (
 	"syscall/js"
+	"fmt"
 )
 
 type Column struct {
@@ -19,4 +20,20 @@ func (w *Column) HTMLObject() js.Value {
 
 func (w *Column) SetFocus() {
 	w.HTMLObject().Call("focus")
+}
+
+func (w *Column) WriteIfChanged(obj js.Value, rownum int) bool {
+	if column,ok := w.Block().widgetsToColumns[w]; ok {
+		table := w.parentWidget.(*Table)
+		pos,_ := table.ViewRow2BufferPos(rownum)
+		buffer := w.Block().Buffer()
+		widgetValue := obj.Get("value").String()
+		bufferValue,_ := buffer.GetAt(pos,column)
+		if widgetValue != bufferValue {
+			fmt.Println("New value for",column,"at",pos,"is",widgetValue)
+			buffer.SetAt(pos,column,widgetValue)
+			return true
+		}
+	}
+	return false
 }

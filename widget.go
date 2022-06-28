@@ -16,6 +16,7 @@ type Widget interface {
 	AddChild(Widget)
 	Children() []Widget 
 	SetFocus()	
+	WriteIfChanged(obj js.Value, rownum int) bool
 }
 
 
@@ -78,45 +79,34 @@ func (w *BaseWidget) Children() []Widget {
 
 func (w *BaseWidget) SetFocus()	{}
 
+func (w *BaseWidget) WriteIfChanged(obj js.Value, rownum int) bool {
+	return false
+}
+
 // ----------------------------------------------------------
 
 
-func AttachOnChangeEvent(widget Widget, obj js.Value, rownum int) {
-	obj.Set("onchange",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		if column,ok := widget.Block().widgetsToColumns[widget]; ok {
-			value := obj.Get("value").String()
-			if rownum < 0 {
-				widget.Block().Buffer().Set(column,value)
-			} else {
-				table := widget.(*Column).parentWidget.(*Table)
-				pos,_ := table.ViewRow2BufferPos(rownum)
-				widget.Block().Buffer().SetAt(pos,column,value)
-			}
-			fmt.Println("OnChange",column,"to",value,"rownum",rownum)
-		}	
-   		return nil
-   	}))
-}
-
-
-func AttachFocusEvents(widget Widget, obj js.Value, pos int) {
+func AttachFocusEvents(widget Widget, obj js.Value, rownum int) {
 	obj.Set("onkeydown",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		event := args[0]
 		keycode := event.Get("keyCode").Int()
 		shiftkey := event.Get("shiftKey").Bool()
 		ctrlkey := event.Get("ctrlKey").Bool()
-		fmt.Println("OnKeyUp:",keycode,shiftkey,ctrlkey,pos)
+		fmt.Println("OnKeyUp:",keycode,shiftkey,ctrlkey,rownum)
 		switch keycode {
 		case 9: // Tab
 			event.Call("preventDefault")
 			if shiftkey && !ctrlkey {
+				widget.WriteIfChanged(obj,rownum)
 				widget.Block().PrevWidget().SetFocus()
 			} else if !shiftkey && !ctrlkey {
+				widget.WriteIfChanged(obj,rownum)
 				widget.Block().NextWidget().SetFocus()
 			}
 		case 38: // Up
 			event.Call("preventDefault")
 			if !shiftkey && !ctrlkey {
+				widget.WriteIfChanged(obj,rownum)
 				buffer := widget.Block().Buffer()
 				lastPos := buffer.pos
 				buffer.Goto(lastPos-1)
@@ -128,6 +118,7 @@ func AttachFocusEvents(widget Widget, obj js.Value, pos int) {
 		case 40: // Down
 			event.Call("preventDefault")
 			if !shiftkey && !ctrlkey {
+				widget.WriteIfChanged(obj,rownum)
 				buffer := widget.Block().Buffer()
 				lastPos := buffer.pos
 				buffer.Goto(lastPos+1)
@@ -138,7 +129,8 @@ func AttachFocusEvents(widget Widget, obj js.Value, pos int) {
 			}
 		case 33: // PgUp
 			event.Call("preventDefault")
-			if !shiftkey && !ctrlkey && pos != NOTINTABLE {
+			if !shiftkey && !ctrlkey && rownum != NOTINTABLE {
+				widget.WriteIfChanged(obj,rownum)
 				buffer := widget.Block().Buffer()
 				table := widget.(*Column).parentWidget.(*Table)
 				lastPos := buffer.pos
@@ -154,7 +146,8 @@ func AttachFocusEvents(widget Widget, obj js.Value, pos int) {
 			}
 		case 34: // PgDn
 			event.Call("preventDefault")
-			if !shiftkey && !ctrlkey && pos != NOTINTABLE {
+			if !shiftkey && !ctrlkey && rownum != NOTINTABLE {
+				widget.WriteIfChanged(obj,rownum)
 				buffer := widget.Block().Buffer()
 				table := widget.(*Column).parentWidget.(*Table)
 				lastPos := buffer.pos
@@ -172,11 +165,11 @@ func AttachFocusEvents(widget Widget, obj js.Value, pos int) {
    		return nil
    	}))
     obj.Set("onfocus",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		fmt.Println("OnFocus:",obj,pos)
-		if pos != NOTINTABLE {
+		fmt.Println("OnFocus:",obj,rownum)
+		if rownum != NOTINTABLE {
 			table := widget.(*Column).parentWidget.(*Table)
 			buffer := widget.Block().Buffer()
-			bufferPos,_ := table.ViewRow2BufferPos(pos)
+			bufferPos,_ := table.ViewRow2BufferPos(rownum)
 			if bufferPos != buffer.pos {
 				buffer.Goto(bufferPos)
 				widget.Block().Refresh()
@@ -187,7 +180,8 @@ func AttachFocusEvents(widget Widget, obj js.Value, pos int) {
    		return nil
    	}))
 	obj.Call("addEventListener","focusout",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		fmt.Println("OnFocusOut:",obj,pos)
+		fmt.Println("OnFocusOut:",obj,rownum)
+		widget.WriteIfChanged(obj,rownum)
    		return nil
    	}))
 
