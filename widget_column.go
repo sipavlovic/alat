@@ -22,6 +22,11 @@ func (w *Column) SetFocus() {
 	w.HTMLObject().Call("focus")
 }
 
+func (w *Column) SelectAll() {
+	w.HTMLObject().Call("select")
+}
+
+
 func (w *Column) WriteIfChanged(obj js.Value, rownum int) bool {
 	if column,ok := w.Block().widgetsToColumns[w]; ok {
 		table := w.parentWidget.(*Table)

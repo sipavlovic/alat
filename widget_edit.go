@@ -34,9 +34,23 @@ func (w *Edit) Refresh() {
 	w.BaseWidget.Refresh()
 }
 
+func (w *Edit) RefreshCurrentRow() {
+	result := ""
+	if column,ok := w.Block().widgetsToColumns[w]; ok {
+		result,_ = w.Block().Buffer().Get(column)
+	}
+	w.HTMLObject().Set("value",result)
+	w.BaseWidget.RefreshCurrentRow()
+}
+
 func (w *Edit) SetFocus() {
 	w.HTMLObject().Call("focus")
 }
+
+func (w *Edit) SelectAll() {
+	w.HTMLObject().Call("select")
+}
+
 
 func (w *Edit) WriteIfChanged(obj js.Value, rownum int) bool {
 	if column,ok := w.Block().widgetsToColumns[w]; ok {

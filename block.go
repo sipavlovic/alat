@@ -48,8 +48,16 @@ func (b *Block) Draw() {
 
 
 func (b *Block) Refresh() {
+	fmt.Println("Block Refresh")
 	for _,widget := range b.widgets {
 		widget.Refresh()
+	}
+}
+
+func (b *Block) RefreshCurrentRow() {
+	fmt.Println("Block Refresh Current Row")
+	for _,widget := range b.widgets {
+		widget.RefreshCurrentRow()
 	}
 }
 
@@ -104,6 +112,11 @@ func (b *Block) PrevWidget() Widget {
 		return b.LastWidget()
 	}
 	return b.focusList[idx]
+}
+
+
+func (b *Block) Pos() int { 
+	return b.buffer.pos
 }
 
 

@@ -45,6 +45,17 @@ func (w *Table) Refresh() {
 	w.DrawContent()
 }
 
+func (w *Table) RefreshCurrentRow() {
+	for _,widgetColumn := range w.columns {
+		result := ""
+		if column,ok := w.Block().widgetsToColumns[widgetColumn]; ok {
+			result,_ = w.Block().Buffer().Get(column)
+		}
+		widgetColumn.HTMLObject().Set("value",result)
+	}
+}
+
+
 
 func (w *Table) DrawContent() {
 	ClearNode(w.tableObj)

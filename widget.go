@@ -13,10 +13,12 @@ type Widget interface {
 	HTMLObject() js.Value
 	Draw()
 	Refresh()
+	RefreshCurrentRow()
 	AddChild(Widget)
 	Children() []Widget 
 	SetFocus()	
 	WriteIfChanged(obj js.Value, rownum int) bool
+	SelectAll()
 }
 
 
@@ -69,6 +71,13 @@ func (w *BaseWidget) Refresh() {
 	}
 }
 
+func (w *BaseWidget) RefreshCurrentRow() {
+	for _, child := range w.children {
+		child.RefreshCurrentRow()
+	}
+}
+
+
 func (w *BaseWidget) AddChild(child Widget) {
 	w.children = append(w.children,child)
 }
@@ -82,6 +91,9 @@ func (w *BaseWidget) SetFocus()	{}
 func (w *BaseWidget) WriteIfChanged(obj js.Value, rownum int) bool {
 	return false
 }
+
+func (w *BaseWidget) SelectAll() {}
+
 
 // ----------------------------------------------------------
 
@@ -98,9 +110,11 @@ func AttachFocusEvents(widget Widget, obj js.Value, rownum int) {
 			event.Call("preventDefault")
 			if shiftkey && !ctrlkey {
 				widget.WriteIfChanged(obj,rownum)
+				widget.Block().Refresh()
 				widget.Block().PrevWidget().SetFocus()
 			} else if !shiftkey && !ctrlkey {
 				widget.WriteIfChanged(obj,rownum)
+				widget.Block().Refresh()
 				widget.Block().NextWidget().SetFocus()
 			}
 		case 38: // Up
@@ -174,9 +188,11 @@ func AttachFocusEvents(widget Widget, obj js.Value, rownum int) {
 				buffer.Goto(bufferPos)
 				widget.Block().Refresh()
 				widget.SetFocus()
-			}
+			}	
 		}
 		widget.Block().OnFocusToWidget(widget)
+		widget.Block().RefreshCurrentRow()
+		widget.SelectAll()
    		return nil
    	}))
 	obj.Call("addEventListener","focusout",js.FuncOf(func(this js.Value, args []js.Value) interface{} {

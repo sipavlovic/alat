@@ -4,6 +4,7 @@
 ========
 
 
+
 ========
   DONE 
 ========
@@ -23,3 +24,6 @@
 2022-06-27) Make change events and updating buffer values
 2022-06-29) BUG: onchange not working on edit widget when press up/down
 2022-06-29) Show current line in table
+2022-06-30) Block.Pos()
+2022-06-30) Onfocus-selectAll (column, edit)
+2022-06-30) Bugfix refresh problem (duplicate widget, same row) - on click focus, RefreshCurrentRow()
