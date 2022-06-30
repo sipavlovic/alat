@@ -66,7 +66,7 @@ func main() {
 	alat.NewLabel(block,container,"Password (copy):")
 	w_pwd2 := alat.NewEdit(block,container)
 	alat.NewLabel(block,container,"Table:")
-	table := alat.NewTable(block,container,10)
+	table := alat.NewTable(block,container,7)
 	col_one := table.AddColumn("One")
 	col_one2 := table.AddColumn("One (copy)")
 	col_two := table.AddColumn("Two")

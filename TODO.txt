@@ -4,7 +4,6 @@
 ========
 
 
-
 ========
   DONE 
 ========
@@ -27,3 +26,4 @@
 2022-06-30) Block.Pos()
 2022-06-30) Onfocus-selectAll (column, edit)
 2022-06-30) Bugfix refresh problem (duplicate widget, same row) - on click focus, RefreshCurrentRow()
+2022-06-30) put refresh current row on outfocus

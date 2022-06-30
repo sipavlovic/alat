@@ -198,6 +198,8 @@ func AttachFocusEvents(widget Widget, obj js.Value, rownum int) {
 	obj.Call("addEventListener","focusout",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		fmt.Println("OnFocusOut:",obj,rownum)
 		widget.WriteIfChanged(obj,rownum)
+		widget.Block().RefreshCurrentRow()
+		// preventing focusout: widget.SetFocus()
    		return nil
    	}))
 
