@@ -13,6 +13,10 @@ import (
 	"strconv"
 )
 
+const (
+	version = "2022-07-02"
+)
+
 func MakeCSS() {
 	head := js.Global().Get("document").Get("head")
 	css := alat.NewNode(head,"style")
@@ -51,6 +55,21 @@ func FromInt(value int) string {
 }
 
 
+type NewLineWidget struct {
+	alat.BaseWidget
+}
+func NewLine(block *alat.Block, parentWidget alat.Widget) *NewLineWidget {
+	var w NewLineWidget
+	w.BaseWidget.Init(block, &w, parentWidget)
+	return &w
+}
+func (w *NewLineWidget) Draw() {
+	elem := alat.NewNode(w.ParentHTMLObject(),"BR")
+	w.BaseWidget.SetHTMLObject(elem)
+	w.BaseWidget.Draw()
+}
+
+
 
 func main() {
 
@@ -59,12 +78,16 @@ func main() {
 
 	block := alat.NewBlock(body)
 	container := alat.NewContainer(block,nil) 
+	alat.NewLabel(block,container,"Alat Example version: "+version)
+	NewLine(block,container)
 	alat.NewLabel(block,container,"Enter username:")
 	w_usr := alat.NewEdit(block,container)
 	alat.NewLabel(block,container,"Enter password:")
 	w_pwd := alat.NewEdit(block,container)
 	alat.NewLabel(block,container,"Password (copy):")
 	w_pwd2 := alat.NewEdit(block,container)
+	NewLine(block,container)
+	NewLine(block,container)
 	alat.NewLabel(block,container,"Table:")
 	table := alat.NewTable(block,container,7)
 	col_one := table.AddColumn("One")
@@ -74,6 +97,7 @@ func main() {
 	col_four := table.AddColumn("Four")
 	col_five := table.AddColumn("Five")
 	col_six := table.AddColumn("Six")
+	NewLine(block,container)
 	butt := alat.NewButton(block,container,"Click on me!")
 	butt.SetHandler(func(w *alat.Button) {
 		js.Global().Call("alert","Clicked!")
@@ -91,7 +115,7 @@ func main() {
 	block.Connect(col_six,"SIX")
 	
 	buff := block.Buffer()
-	for i:=1;i<=30;i++ {
+	for i:=1;i<=50;i++ {
 		buff.InsertRow()
 		buff.Set("ID",FromInt(i))
 		buff.Set("USERNAME","User-"+FromInt(i))

@@ -3,6 +3,11 @@
   TODO 
 ========
 
+*) Create ProcessMoveTo(widget,bufferPos)
+  - only place for Goto, SetFocus and Refresh calls
+*) Move viewBegin,viewEnd,visibleRows from Table to Block
+
+
 
 ========
   DONE 
@@ -27,3 +32,26 @@
 2022-06-30) Onfocus-selectAll (column, edit)
 2022-06-30) Bugfix refresh problem (duplicate widget, same row) - on click focus, RefreshCurrentRow()
 2022-06-30) put refresh current row on outfocus
+2022-07-02) Rewrite Table.Refresh() so that html input elemens are not recreated
+   but rather hidden
+
+
+=========
+  IDEAS
+=========
+
+Cases:
+1) Click inside block
+  a) focus out
+  b) focus
+  (repeat?)
+2) Click outside block (eg. url bar)
+  a) focus out
+  ...
+  b) focus
+3) Keypress
+  a) keypress
+  b) focus out
+  c) focus
+  (repeat?)
+

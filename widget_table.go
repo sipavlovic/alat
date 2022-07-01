@@ -42,19 +42,24 @@ func (w *Table) Draw() {
 
 
 func (w *Table) Refresh() {
-	w.DrawContent()
-}
-
-func (w *Table) RefreshCurrentRow() {
-	for _,widgetColumn := range w.columns {
-		result := ""
-		if column,ok := w.Block().widgetsToColumns[widgetColumn]; ok {
-			result,_ = w.Block().Buffer().Get(column)
-		}
-		widgetColumn.HTMLObject().Set("value",result)
+	w.viewBegin, w.viewEnd = w.Block().Buffer().CalcView(w.viewBegin, w.viewEnd, w.visibleRows)
+	for rownum:=0;rownum<w.visibleRows;rownum++ {
+		w.RefreshRownum(rownum)
 	}
 }
 
+func (w *Table) RefreshCurrentRow() {
+	pos := w.Block().Buffer().pos
+	rownum,_ := w.BufferPos2ViewRow(pos)
+	w.RefreshRownum(rownum)
+}
+
+
+func (w *Table) RefreshRownum(rownum int) {
+	for _,widgetColumn := range w.columns {
+		w.RefreshColumnAtRownum(widgetColumn,rownum)
+	}
+}
 
 
 func (w *Table) DrawContent() {
@@ -72,28 +77,12 @@ func (w *Table) DrawContent() {
 
 
 func (w *Table) DrawRow(rownum int) {
-	bufferRow := w.viewBegin+rownum
-	pos := w.Block().Buffer().pos
 	rowtr := NewNode(w.tableObj,"tr")
-	if bufferRow>=0 && bufferRow<=w.viewEnd {
-		for _,columnWidget := range w.columns {
-			rowtd := NewNode(rowtr,"td")
-			input := NewNode(rowtd,"input")
-			if bufferRow==pos {
-				rowtd.Set("style","background-color: #BCE5FD")
-				input.Set("style","background-color: #BCE5FD")
-			}
-			column := w.Block().widgetsToColumns[columnWidget]
-			value,_ := w.Block().Buffer().GetAt(bufferRow,column)
-			input.Set("value", value)
-			AttachFocusEvents(columnWidget,input,rownum)
-		}
-	} else {
-		for range w.columns {
-			rowtd := NewNode(rowtr,"td")
-			rowtd.Set("style","background-color: #CCC")
-		}
-	}
+	for _,columnWidget := range w.columns {
+		rowtd := NewNode(rowtr,"td")
+		input := NewNode(rowtd,"input")
+		AttachFocusEvents(columnWidget,input,rownum)
+	}	
 }
 
 
@@ -102,6 +91,35 @@ func (w *Table) Cell(colnum int, rownum int) js.Value {
 	td := tr.Get("children").Get(strconv.Itoa(colnum))
 	return td.Get("children").Get("0")
 }
+
+
+func (w *Table) RefreshColumnAtRownum(widgetColumn *Column, rownum int) {
+	bufferRow := w.viewBegin+rownum
+	pos := w.Block().Buffer().pos
+	input := w.Cell(widgetColumn.index,rownum)
+	td := input.Get("parentElement")
+	result := ""
+	if bufferRow>=0 && bufferRow<=w.viewEnd {
+		if column,ok := w.Block().widgetsToColumns[widgetColumn]; ok {
+			result,_ = w.Block().Buffer().GetAt(bufferRow,column)
+		}
+		if bufferRow==pos {
+			td.Set("style","background-color: #BCE5FD")
+			input.Set("style","background-color: #BCE5FD")
+			input.Set("type","")
+		} else {
+			td.Set("style","background-color: #FFFFFF")
+			input.Set("style","background-color: #FFFFFF")
+			input.Set("type","")
+		}
+	} else {
+		td.Set("style","background-color: #CCC")
+		input.Set("style","background-color: #CCC")
+		input.Set("type","hidden")
+	}
+	input.Set("value",result)
+}
+
 
 func (w *Table) ViewRow2BufferPos(viewRow int) (int, bool) {
 	if viewRow>=0 && viewRow<w.visibleRows {

@@ -11,6 +11,7 @@ type Widget interface {
 	ParentWidget() Widget
 	ParentHTMLObject() js.Value
 	HTMLObject() js.Value
+	SetHTMLObject(js.Value)
 	Draw()
 	Refresh()
 	RefreshCurrentRow()
@@ -94,6 +95,9 @@ func (w *BaseWidget) WriteIfChanged(obj js.Value, rownum int) bool {
 
 func (w *BaseWidget) SelectAll() {}
 
+func (w *BaseWidget) SetHTMLObject(obj js.Value) {
+	w.htmlObject = obj
+}
 
 // ----------------------------------------------------------
 
@@ -204,4 +208,5 @@ func AttachFocusEvents(widget Widget, obj js.Value, rownum int) {
    	}))
 
 }
+
 
