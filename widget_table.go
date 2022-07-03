@@ -7,17 +7,13 @@ import (
 
 type Table struct {
 	BaseWidget
-	visibleRows int
 	tableObj js.Value
 	columns []*Column
-	viewBegin int
-	viewEnd int
 }
 
-func NewTable(block *Block, parentWidget Widget, visibleRows int) *Table {
+func NewTable(block *Block, parentWidget Widget) *Table {
 	var table Table
 	table.BaseWidget.Init(block, &table, parentWidget)
-	table.visibleRows = visibleRows
 	return &table
 }
 
@@ -42,15 +38,16 @@ func (w *Table) Draw() {
 
 
 func (w *Table) Refresh() {
-	w.viewBegin, w.viewEnd = w.Block().Buffer().CalcView(w.viewBegin, w.viewEnd, w.visibleRows)
-	for rownum:=0;rownum<w.visibleRows;rownum++ {
+	block := w.Block()
+	block.viewBegin, block.viewEnd = block.Buffer().CalcView(block.viewBegin, block.viewEnd, block.visibleRows)
+	for rownum:=0;rownum<block.visibleRows;rownum++ {
 		w.RefreshRownum(rownum)
 	}
 }
 
 func (w *Table) RefreshCurrentRow() {
 	pos := w.Block().Buffer().pos
-	rownum,_ := w.BufferPos2ViewRow(pos)
+	rownum,_ := w.Block().BufferPos2ViewRow(pos)
 	w.RefreshRownum(rownum)
 }
 
@@ -64,13 +61,14 @@ func (w *Table) RefreshRownum(rownum int) {
 
 func (w *Table) DrawContent() {
 	ClearNode(w.tableObj)
-	w.viewBegin, w.viewEnd = w.Block().Buffer().CalcView(w.viewBegin, w.viewEnd, w.visibleRows)
+	block := w.Block()
+	block.viewBegin, block.viewEnd = block.Buffer().CalcView(block.viewBegin, block.viewEnd, block.visibleRows)
 	tr := NewNode(w.tableObj,"tr")
 	for _,col := range w.columns {
 		th := NewNode(tr,"th")
 		th.Set("textContent",col.label)
 	}
-	for rownum:=0;rownum<w.visibleRows;rownum++ {
+	for rownum:=0;rownum<block.visibleRows;rownum++ {
 		w.DrawRow(rownum)
 	}
 }
@@ -94,14 +92,15 @@ func (w *Table) Cell(colnum int, rownum int) js.Value {
 
 
 func (w *Table) RefreshColumnAtRownum(widgetColumn *Column, rownum int) {
-	bufferRow := w.viewBegin+rownum
-	pos := w.Block().Buffer().pos
+	block := w.Block() 
+	bufferRow := block.viewBegin+rownum
+	pos := block.Buffer().pos
 	input := w.Cell(widgetColumn.index,rownum)
 	td := input.Get("parentElement")
 	result := ""
-	if bufferRow>=0 && bufferRow<=w.viewEnd {
-		if column,ok := w.Block().widgetsToColumns[widgetColumn]; ok {
-			result,_ = w.Block().Buffer().GetAt(bufferRow,column)
+	if bufferRow>=0 && bufferRow<=block.viewEnd {
+		if column,ok := block.widgetsToColumns[widgetColumn]; ok {
+			result,_ = block.Buffer().GetAt(bufferRow,column)
 		}
 		if bufferRow==pos {
 			td.Set("style","background-color: #BCE5FD")
@@ -121,27 +120,6 @@ func (w *Table) RefreshColumnAtRownum(widgetColumn *Column, rownum int) {
 }
 
 
-func (w *Table) ViewRow2BufferPos(viewRow int) (int, bool) {
-	if viewRow>=0 && viewRow<w.visibleRows {
-		buffer := w.Block().Buffer()
-		bufferPos := viewRow+w.viewBegin
-		if bufferPos>=0 && bufferPos<len(buffer.rows) {
-			return bufferPos,true
-		}
-	}
-	return 0,false
-}
-
-func (w *Table) BufferPos2ViewRow(bufferPos int) (int, bool) {
-	buffer := w.Block().Buffer()
-	if bufferPos>=0 && bufferPos<len(buffer.rows) {
-		viewRow := bufferPos-w.viewBegin
-		if viewRow>=0 && viewRow<w.visibleRows {
-			return viewRow,true
-		}
-	}
-	return 0,false
-}
 
 
 

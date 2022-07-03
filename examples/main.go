@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	version = "2022-07-02"
+	version = "2022-07-03"
 )
 
 func MakeCSS() {
@@ -76,7 +76,7 @@ func main() {
 	MakeCSS()
 	body := js.Global().Get("document").Get("body")
 
-	block := alat.NewBlock(body)
+	block := alat.NewBlock(body,10)
 	container := alat.NewContainer(block,nil) 
 	alat.NewLabel(block,container,"Alat Example version: "+version)
 	NewLine(block,container)
@@ -89,7 +89,7 @@ func main() {
 	NewLine(block,container)
 	NewLine(block,container)
 	alat.NewLabel(block,container,"Table:")
-	table := alat.NewTable(block,container,7)
+	table := alat.NewTable(block,container)
 	col_one := table.AddColumn("One")
 	col_one2 := table.AddColumn("One (copy)")
 	col_two := table.AddColumn("Two")
@@ -127,7 +127,6 @@ func main() {
 		buff.Set("FIVE","Five-"+FromInt(i))
 		buff.Set("SIX","Six-"+FromInt(i))
 	}
-	fmt.Println("Buffer:",buff)
 
 	block.Draw()
 	block.Refresh()

@@ -3,7 +3,6 @@ package alat
 
 import (
 	"syscall/js"
-	"fmt"
 )
 
 type Block struct {
@@ -15,9 +14,14 @@ type Block struct {
 	focusList []Widget
 	focusIndexed map[Widget]int
 	currentWidget Widget
+	viewBegin int
+	viewEnd int
+	visibleRows int
+	lastFocusOutWidget Widget
+	lastFocusOutPos int
 }
 
-func NewBlock(mainHtmlObject js.Value) *Block {
+func NewBlock(mainHtmlObject js.Value, visibleRows int) *Block {
 	var block Block
 	block.htmlObject = mainHtmlObject
 	block.buffer = NewBuffer()
@@ -26,6 +30,7 @@ func NewBlock(mainHtmlObject js.Value) *Block {
 	block.focusList = make([]Widget,0)
 	block.focusIndexed = make(map[Widget]int)
 	block.currentWidget = nil
+	block.visibleRows = visibleRows
 	return &block
 }
 
@@ -48,14 +53,14 @@ func (b *Block) Draw() {
 
 
 func (b *Block) Refresh() {
-	fmt.Println("Block Refresh")
+	//fmt.Println("Block Refresh")
 	for _,widget := range b.widgets {
 		widget.Refresh()
 	}
 }
 
 func (b *Block) RefreshCurrentRow() {
-	fmt.Println("Block Refresh Current Row")
+	//fmt.Println("Block Refresh Current Row")
 	for _,widget := range b.widgets {
 		widget.RefreshCurrentRow()
 	}
@@ -70,7 +75,7 @@ func (b *Block) AddToFocusList(widget Widget) {
 
 func (b *Block) OnFocusToWidget(widget Widget) {
 	b.currentWidget = widget
-	fmt.Println("Focus set to column:",b.widgetsToColumns[b.currentWidget])
+	//fmt.Println("Focus set to column:",b.widgetsToColumns[b.currentWidget])
 }
 
 
@@ -118,5 +123,26 @@ func (b *Block) PrevWidget() Widget {
 func (b *Block) Pos() int { 
 	return b.buffer.pos
 }
+
+func (b *Block) ViewRow2BufferPos(viewRow int) (int, bool) {
+	if viewRow>=0 && viewRow<=b.visibleRows {
+		bufferPos := viewRow+b.viewBegin
+		if bufferPos>=0 && bufferPos<len(b.buffer.rows) {
+			return bufferPos,true
+		}
+	}
+	return 0,false
+}
+
+func (b *Block) BufferPos2ViewRow(bufferPos int) (int, bool) {
+	if bufferPos>=0 && bufferPos<len(b.buffer.rows) {
+		viewRow := bufferPos-b.viewBegin
+		if viewRow>=0 && viewRow<b.visibleRows {
+			return viewRow,true
+		}
+	}
+	return 0,false
+}
+
 
 

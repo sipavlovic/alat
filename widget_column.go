@@ -14,7 +14,7 @@ type Column struct {
 func (w *Column) HTMLObject() js.Value {
 	table := w.ParentWidget().(*Table)
 	buffer := w.Block().Buffer()
-	viewRow,_ := table.BufferPos2ViewRow(buffer.pos)
+	viewRow,_ := w.Block().BufferPos2ViewRow(buffer.pos)
 	return table.Cell(w.index,viewRow)
 }
 
@@ -29,8 +29,7 @@ func (w *Column) SelectAll() {
 
 func (w *Column) WriteIfChanged(obj js.Value, rownum int) bool {
 	if column,ok := w.Block().widgetsToColumns[w]; ok {
-		table := w.parentWidget.(*Table)
-		pos,_ := table.ViewRow2BufferPos(rownum)
+		pos,_ := w.Block().ViewRow2BufferPos(rownum)
 		buffer := w.Block().Buffer()
 		widgetValue := obj.Get("value").String()
 		bufferValue,_ := buffer.GetAt(pos,column)
