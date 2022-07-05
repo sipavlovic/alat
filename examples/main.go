@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	version = "2022-07-03"
+	version = "2022-07-05"
 )
 
 func MakeCSS() {
