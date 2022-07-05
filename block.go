@@ -3,6 +3,7 @@ package alat
 
 import (
 	"syscall/js"
+	"fmt"
 )
 
 type Block struct {
@@ -73,12 +74,6 @@ func (b *Block) AddToFocusList(widget Widget) {
 }
 
 
-func (b *Block) OnFocusToWidget(widget Widget) {
-	b.currentWidget = widget
-	//fmt.Println("Focus set to column:",b.widgetsToColumns[b.currentWidget])
-}
-
-
 func (b *Block) FocusCurrent() {
 	if b.currentWidget != nil {
 		b.currentWidget.SetFocus()
@@ -145,4 +140,18 @@ func (b *Block) BufferPos2ViewRow(bufferPos int) (int, bool) {
 }
 
 
+func (b *Block) OnFocusToWidget(widget Widget) {
+	b.currentWidget = widget
+	//fmt.Println("Focus set to column:",b.widgetsToColumns[b.currentWidget])
+}
+
+
+func (b *Block) GotoRequest(newWidget Widget, newPos int) bool {
+	lastWidget := b.lastFocusOutWidget
+	lastPos := b.lastFocusOutPos
+	response := false
+	fmt.Printf("Goto Request from %p:%d to %p:%d = %v",
+		lastWidget,lastPos,newWidget,newPos,response)
+	return response
+}
 

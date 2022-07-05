@@ -3,9 +3,8 @@
   TODO 
 ========
 
-*) Create ProcessMoveTo(widget,bufferPos)
+*) Create Block.GotoRequest(widget,bufferPos) bool
   - only place for Goto, SetFocus and Refresh calls
-
 
 
 ========
@@ -36,6 +35,8 @@
 2022-07-03) Move viewBegin,viewEnd,visibleRows, ViewRow2BufferPos(), BufferPos2ViewRow() from Table to Block
 2022-07-03) PgUp and PgDn at Edit and Button Widgets  
 
+*) Ctrl Home & Ctrl End (first and last pos)
+
 
 
 =========
@@ -43,17 +44,11 @@
 =========
 
 Cases:
-1) Click inside block
-  a) focus out
-  b) focus
-  (repeat?)
-2) Click outside block (eg. url bar)
-  a) focus out
-  ...
-  b) focus
-3) Keypress
-  a) keypress
-  b) focus out
-  c) focus
-  (repeat?)
+1) From widget to widget by keypress (main onkeydown)
+2) From widget to widget by click (main onfocus)
+3) From widget to urlbar and back by keypress (main onfocus)
+4) From widget to urlbar and back by click (main onfocus)
+--
+a) On focus out or onkeydown - remembers last widget,pos pair
+b) On focus - calculate new widget,pos pair and calls Block.GotoRequest()
 

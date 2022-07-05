@@ -183,10 +183,51 @@ func AttachFocusEvents(widget Widget, obj js.Value, rownum int) {
 				}
 				widget.SelectAll()
 			}
+		case 36: // Home
+			if !shiftkey && ctrlkey {
+				event.Call("preventDefault")
+				widget.WriteIfChanged(obj,rownum)
+				block := widget.Block()
+				buffer := block.Buffer()
+				lastPos := buffer.pos
+				buffer.Goto(0)
+				if lastPos != buffer.pos {
+					block.Refresh()
+					widget.SetFocus()
+				}
+				widget.SelectAll()
+			}
+		case 35: // End
+			if !shiftkey && ctrlkey {
+				event.Call("preventDefault")
+				widget.WriteIfChanged(obj,rownum)
+				block := widget.Block()
+				buffer := block.Buffer()
+				lastPos := buffer.pos
+				buffer.Goto(len(buffer.rows)-1)
+				if lastPos != buffer.pos {
+					block.Refresh()
+					widget.SetFocus()
+				}
+				widget.SelectAll()
+			}
 		}
    		return nil
    	}))
+	/*
+	obj.Set("onmousedown",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		fmt.Printf("OnClick:%p,%d\n",widget,rownum)
+		return nil
+	}))
+	*/
     obj.Set("onfocus",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		/* naive test - failed
+		if rownum == 0 {
+			event := args[0]
+			event.Call("preventDefault")
+			return nil
+		}
+		*/
 		block := widget.Block()
 		fmt.Printf("OnFocus:%p,%d (from %p,%d)\n",widget,block.Pos(),
 			block.lastFocusOutWidget,block.lastFocusOutPos)
