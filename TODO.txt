@@ -5,21 +5,10 @@
 
 *) Create Block.GotoRequest(widget,bufferPos) bool
   - only place for Goto, SetFocus and Refresh calls
-*) Make several types of widgets: 
-  - focusable (eg edit, button): IsFocusable
-  - nonfocusable (eg label): not IsFocusable and not IsMultiline
-  - table (eg table): IsTable
-*) Make all focusable widgets (eg edit) able to be standalone or used in table for multiline
-  - if parent widget is IsTable, then widget is treated as column
-  - no special column widget
 *) Events: OnExitField, OnActionField, OnEnterRow, OnExitRow, OnEnterBlock, OnExitBlock
 *) Single Fields (variable,stadalone), Multi Fields (row fields) in buffer
 *) Buttons need to connect to field and reacts to OnActionField as Onclick
 *) All connections should be made within widget constructors (buffer fields defined before)
-*) All focusable widget should have label as integral part, label should be used as 
-   label edit pair standalone, label button. or column label in table
-*) Define several new interfaces instead of single Widget (FocusableWidget, TableWidget 
-   as well as base Widget)
 
 
 ========
@@ -50,6 +39,19 @@
 2022-07-03) Move viewBegin,viewEnd,visibleRows, ViewRow2BufferPos(), BufferPos2ViewRow() from Table to Block
 2022-07-03) PgUp and PgDn at Edit and Button Widgets  
 2022-07-05) Ctrl Home & Ctrl End (first and last pos)
+2022-07-14) Make all focusable widgets (eg edit) able to be standalone or used in table for multiline
+  - if parent widget is IsMultirow, then widget is treated as column
+  - no special column widget
+2022-07-14) Make several types of widgets: 
+  - focusable (eg edit, button): IsFocusable
+  - nonfocusable (eg label): not IsFocusable and not IsMultiline
+  - parent: can contain different sub widgets
+  - multirow (eg table): IsMultirow
+2022-07-14) Define several new interfaces instead of single Widget (FocusableWidget, ParentWidget,  
+   MultiRowWidget as well as base Widget)
+2022-07-14) All focusable widget should have label as integral part, label should be used as 
+   label edit pair standalone, label button. or column label in table
+2022-07-14) BUG: when keyboard movement source row is copied to target row
 
 
 
@@ -65,4 +67,5 @@ Cases:
 --
 a) On focus out or onkeydown - remembers last widget,pos pair
 b) On focus - calculate new widget,pos pair and calls Block.GotoRequest()
+
 

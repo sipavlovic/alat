@@ -6,7 +6,7 @@ type Label struct {
 	text string
 }
 
-func NewLabel(block *Block, parentWidget Widget, text string) *Label {
+func NewLabel(block *Block, parentWidget ParentWidget, text string) *Label {
 	var label Label
 	label.BaseWidget.Init(block, &label, parentWidget)
 	label.text = text

@@ -10,15 +10,15 @@ type Block struct {
 	htmlObject js.Value
 	widgets []Widget
 	buffer *Buffer
-	columnsToWidgets map[string]Widget
-	widgetsToColumns map[Widget]string
-	focusList []Widget
-	focusIndexed map[Widget]int
-	currentWidget Widget
+	columnsToWidgets map[string]FocusableWidget
+	widgetsToColumns map[FocusableWidget]string
+	focusList []FocusableWidget
+	focusIndexed map[FocusableWidget]int
+	currentWidget FocusableWidget
 	viewBegin int
 	viewEnd int
 	visibleRows int
-	lastFocusOutWidget Widget
+	lastFocusOutWidget FocusableWidget
 	lastFocusOutPos int
 }
 
@@ -26,10 +26,10 @@ func NewBlock(mainHtmlObject js.Value, visibleRows int) *Block {
 	var block Block
 	block.htmlObject = mainHtmlObject
 	block.buffer = NewBuffer()
-	block.columnsToWidgets = make(map[string]Widget)
-	block.widgetsToColumns = make(map[Widget]string)
-	block.focusList = make([]Widget,0)
-	block.focusIndexed = make(map[Widget]int)
+	block.columnsToWidgets = make(map[string]FocusableWidget)
+	block.widgetsToColumns = make(map[FocusableWidget]string)
+	block.focusList = make([]FocusableWidget,0)
+	block.focusIndexed = make(map[FocusableWidget]int)
 	block.currentWidget = nil
 	block.visibleRows = visibleRows
 	return &block
@@ -39,7 +39,7 @@ func (b *Block) Buffer() *Buffer {
 	return b.buffer
 }
 
-func (b *Block) Connect(widget Widget, column string) {
+func (b *Block) Connect(widget FocusableWidget, column string) {
 	b.columnsToWidgets[column] = widget
 	b.widgetsToColumns[widget] = column
 }
@@ -68,7 +68,7 @@ func (b *Block) RefreshCurrentRow() {
 }
 
 
-func (b *Block) AddToFocusList(widget Widget) {
+func (b *Block) AddToFocusList(widget FocusableWidget) {
 	b.focusList = append(b.focusList,widget)
 	b.focusIndexed[widget] = len(b.focusList)-1
 }
@@ -81,17 +81,17 @@ func (b *Block) FocusCurrent() {
 }
 
 
-func (b *Block) FirstWidget() Widget { 
+func (b *Block) FirstWidget() FocusableWidget { 
 	return b.focusList[0]
 }
 
 
-func (b *Block) LastWidget() Widget { 
+func (b *Block) LastWidget() FocusableWidget { 
 	return b.focusList[len(b.focusList)-1]
 }
 
 
-func (b *Block) NextWidget() Widget { 
+func (b *Block) NextWidget() FocusableWidget { 
 	if b.currentWidget == nil {
 		return b.FirstWidget()
 	}
@@ -103,7 +103,7 @@ func (b *Block) NextWidget() Widget {
 }
 
 
-func (b *Block) PrevWidget() Widget { 
+func (b *Block) PrevWidget() FocusableWidget { 
 	if b.currentWidget == nil {
 		return b.FirstWidget()
 	}
@@ -139,14 +139,26 @@ func (b *Block) BufferPos2ViewRow(bufferPos int) (int, bool) {
 	return 0,false
 }
 
+func (b *Block) RownumState(rownum int) int {
+	bufferRow := b.viewBegin+rownum
+	pos := b.Buffer().pos
+	if bufferRow>=0 && bufferRow<=b.viewEnd {
+		if bufferRow==pos {
+			return ROWNUM_CURRENT
+		}
+		return ROWNUM_NOT_CURRENT
+	}
+	return ROWNUM_NOT_EXISTS
+}
 
-func (b *Block) OnFocusToWidget(widget Widget) {
+
+func (b *Block) OnFocusToWidget(widget FocusableWidget) {
 	b.currentWidget = widget
 	//fmt.Println("Focus set to column:",b.widgetsToColumns[b.currentWidget])
 }
 
 
-func (b *Block) GotoRequest(newWidget Widget, newPos int) bool {
+func (b *Block) GotoRequest(newWidget FocusableWidget, newPos int) bool {
 	lastWidget := b.lastFocusOutWidget
 	lastPos := b.lastFocusOutPos
 	response := false

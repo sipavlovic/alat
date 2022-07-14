@@ -1,12 +1,12 @@
 package alat
 
 type Container struct {
-	BaseWidget
+	BaseParentWidget
 }
 
-func NewContainer(block *Block, parentWidget Widget) *Container {
+func NewContainer(block *Block, parentWidget ParentWidget) *Container {
 	var container Container
-	container.BaseWidget.Init(block, &container, parentWidget)
+	container.BaseParentWidget.Init(block, &container, parentWidget)
 	return &container
 }
 

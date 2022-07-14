@@ -8,21 +8,29 @@ import (
 
 
 type Edit struct {
-	BaseWidget
+	BaseFocusableWidget
 }
 
-func NewEdit(block *Block, parentWidget Widget) *Edit {
+func NewEdit(block *Block, parentWidget ParentWidget, label string) *Edit {
 	var edit Edit
-	edit.BaseWidget.Init(block, &edit, parentWidget)
-	block.AddToFocusList(&edit)
+	edit.BaseFocusableWidget.Init(block, &edit, parentWidget, label)
 	return &edit
 }
 
 func (w *Edit) Draw() {
-	input := NewNode(w.ParentHTMLObject(),"input")
+	divLabel := NewNode(w.ParentHTMLObject(),"div")
+	divLabel.Set("textContent",w.Label())
+	divInput := NewNode(w.ParentHTMLObject(),"div")
+	input := NewNode(divInput,"input")
 	w.htmlObject = input
-	w.BaseWidget.Draw()
+	w.BaseFocusableWidget.Draw()
 	AttachFocusEvents(w,input,NOTINTABLE)
+}
+
+func (w *Edit) DrawInMultiRow(parent js.Value, rownum int) js.Value {
+	input := NewNode(parent,"input")
+	AttachFocusEvents(w,input,rownum)
+	return input
 }
 
 func (w *Edit) Refresh() {
@@ -43,25 +51,28 @@ func (w *Edit) RefreshCurrentRow() {
 	w.BaseWidget.RefreshCurrentRow()
 }
 
-func (w *Edit) SetFocus() {
-	w.HTMLObject().Call("focus")
-}
-
-func (w *Edit) SelectAll() {
-	w.HTMLObject().Call("select")
-}
-
-
 func (w *Edit) WriteIfChanged(obj js.Value, rownum int) bool {
 	if column,ok := w.Block().widgetsToColumns[w]; ok {
 		buffer := w.Block().Buffer()
 		widgetValue := obj.Get("value").String()
-		bufferValue,_ := buffer.Get(column)
-		if widgetValue != bufferValue {
-			fmt.Println("New value for",column,"is",widgetValue)
-			buffer.Set(column,widgetValue)
-			return true
+		bufferValue := ""
+		if w.IsInMultiRow() {
+			pos,_ := w.Block().ViewRow2BufferPos(rownum)
+			bufferValue,_ = buffer.GetAt(pos,column)
+			if widgetValue != bufferValue {
+				fmt.Println("New value for",column,"at",rownum,"is",widgetValue)
+				buffer.SetAt(pos,column,widgetValue)
+				return true
+			}
+		} else {
+			bufferValue,_ = buffer.Get(column)
+			if widgetValue != bufferValue {
+				fmt.Println("New value for",column,"is",widgetValue)
+				buffer.Set(column,widgetValue)
+				return true
+			}
 		}
 	}
 	return false
 }
+

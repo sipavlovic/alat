@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	version = "2022-07-05"
+	version = "2022-07-14"
 )
 
 func MakeCSS() {
@@ -58,7 +58,7 @@ func FromInt(value int) string {
 type NewLineWidget struct {
 	alat.BaseWidget
 }
-func NewLine(block *alat.Block, parentWidget alat.Widget) *NewLineWidget {
+func NewLine(block *alat.Block, parentWidget alat.ParentWidget) *NewLineWidget {
 	var w NewLineWidget
 	w.BaseWidget.Init(block, &w, parentWidget)
 	return &w
@@ -80,24 +80,27 @@ func main() {
 	container := alat.NewContainer(block,nil) 
 	alat.NewLabel(block,container,"Alat Example version: "+version)
 	NewLine(block,container)
-	alat.NewLabel(block,container,"Enter username:")
-	w_usr := alat.NewEdit(block,container)
-	alat.NewLabel(block,container,"Enter password:")
-	w_pwd := alat.NewEdit(block,container)
-	alat.NewLabel(block,container,"Password (copy):")
-	w_pwd2 := alat.NewEdit(block,container)
+	w_usr := alat.NewEdit(block,container,"Enter username:")
+	w_pwd := alat.NewEdit(block,container,"Enter password:")
+	w_pwd2 := alat.NewEdit(block,container,"Password (copy):")
 	NewLine(block,container)
 	NewLine(block,container)
+
 	alat.NewLabel(block,container,"Table:")
 	table := alat.NewTable(block,container)
-	col_one := table.AddColumn("One")
-	col_one2 := table.AddColumn("One (copy)")
-	col_two := table.AddColumn("Two")
-	col_three := table.AddColumn("Three")
-	col_four := table.AddColumn("Four")
-	col_five := table.AddColumn("Five")
-	col_six := table.AddColumn("Six")
+	col_one := alat.NewEdit(block,table,"One")
+	col_one2 := alat.NewEdit(block,table,"One (copy)")
+	col_two := alat.NewEdit(block,table,"Two")
+	col_three := alat.NewEdit(block,table,"Three")
+	col_four := alat.NewEdit(block,table,"Four")
+	col_five := alat.NewEdit(block,table,"Five")
+	col_six := alat.NewEdit(block,table,"Six")
+	col_seven := alat.NewButton(block,table,"Click!")
+	col_seven.SetHandler(func(w *alat.Button) {
+		js.Global().Call("alert",fmt.Sprintf("Row pos: %d",block.Pos()))
+	})
 	NewLine(block,container)
+	
 	butt := alat.NewButton(block,container,"Click on me!")
 	butt.SetHandler(func(w *alat.Button) {
 		js.Global().Call("alert","Clicked!")
@@ -106,6 +109,7 @@ func main() {
 	block.Connect(w_usr,"USERNAME")
 	block.Connect(w_pwd,"PASSWORD")
 	block.Connect(w_pwd2,"PASSWORD")
+	
 	block.Connect(col_one,"ONE")
 	block.Connect(col_one2,"ONE")
 	block.Connect(col_two,"TWO")
@@ -113,7 +117,7 @@ func main() {
 	block.Connect(col_four,"FOUR")
 	block.Connect(col_five,"FIVE")
 	block.Connect(col_six,"SIX")
-	
+		
 	buff := block.Buffer()
 	for i:=1;i<=50;i++ {
 		buff.InsertRow()
@@ -132,6 +136,12 @@ func main() {
 	block.Refresh()
 	
 	fmt.Println("End defining.")
+
+	fmt.Println("Table cols:",table.Children())
+	for _,widget := range table.Children() {
+		w := widget.(alat.FocusableWidget)
+		fmt.Println(" - label:",w.Label()," index:",w.Index())
+	}
 
 	<-make(chan struct{})
 }
