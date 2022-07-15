@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	version = "2022-07-14"
+	version = "2022-07-15"
 )
 
 func MakeCSS() {
@@ -71,12 +71,21 @@ func (w *NewLineWidget) Draw() {
 
 
 
-func main() {
 
-	MakeCSS()
-	body := js.Global().Get("document").Get("body")
 
-	block := alat.NewBlock(body,10)
+
+
+
+
+
+
+
+
+// ====================================================================================
+
+func NewMainBlock() *alat.Block {
+
+	block := alat.NewBlock(alat.HTMLBody,10)
 	container := alat.NewContainer(block,nil) 
 	alat.NewLabel(block,container,"Alat Example version: "+version)
 	NewLine(block,container)
@@ -101,9 +110,13 @@ func main() {
 	})
 	NewLine(block,container)
 	
-	butt := alat.NewButton(block,container,"Click on me!")
+	butt := alat.NewButton(block,container,"Open modal window!")
 	butt.SetHandler(func(w *alat.Button) {
-		js.Global().Call("alert","Clicked!")
+		//alat.HTMLWindow.Call("alert","Clicked!")
+		newblock := NewSubBlock()
+		newblock.Draw()
+		newblock.Refresh()
+		fmt.Println("EXIT BUTTON CLICK ON MAIN BLOCK!!!")
 	})
 
 	block.Connect(w_usr,"USERNAME")
@@ -132,16 +145,79 @@ func main() {
 		buff.Set("SIX","Six-"+FromInt(i))
 	}
 
+	return block
+
+}
+
+
+
+
+
+
+
+
+
+// ==================================================================================
+
+func NewSubBlock() *alat.Block {
+
+	block := alat.NewBlock(alat.HTMLBody,5)
+	modal := NewModalWindow(block,"Modal Window")
+
+	alat.NewLabel(block,modal,"Sorry, still not modal...")
+	NewLine(block,modal)
+	table := alat.NewTable(block,modal)
+	col_one := alat.NewEdit(block,table,"One")
+	col_two := alat.NewEdit(block,table,"Two")
+	col_three := alat.NewEdit(block,table,"Three")
+	col_four := alat.NewEdit(block,table,"Four")
+	col_five := alat.NewEdit(block,table,"Five")
+	col_six := alat.NewEdit(block,table,"Six")
+	NewLine(block,modal)
+	butt := alat.NewButton(block,modal,"Close")
+	butt.SetHandler(func(w *alat.Button) {
+		modal.Close()
+	})
+
+	block.Connect(col_one,"ONE")
+	block.Connect(col_two,"TWO")
+	block.Connect(col_three,"THREE")
+	block.Connect(col_four,"FOUR")
+	block.Connect(col_five,"FIVE")
+	block.Connect(col_six,"SIX")
+
+	buff := block.Buffer()
+	for i:=1;i<=100;i++ {
+		buff.InsertRow()
+		buff.Set("ID",FromInt(i))
+		buff.Set("ONE","One-"+FromInt(i))
+		buff.Set("TWO","Two-"+FromInt(i))
+		buff.Set("THREE","Three-"+FromInt(i))
+		buff.Set("FOUR","Four-"+FromInt(i))
+		buff.Set("FIVE","Five-"+FromInt(i))
+		buff.Set("SIX","Six-"+FromInt(i))
+	}
+
+	return block
+
+}
+
+
+
+
+
+
+
+
+// ==================================================================================
+
+func main() {
+
+	MakeCSS()
+
+	block := NewMainBlock()
 	block.Draw()
 	block.Refresh()
-	
-	fmt.Println("End defining.")
-
-	fmt.Println("Table cols:",table.Children())
-	for _,widget := range table.Children() {
-		w := widget.(alat.FocusableWidget)
-		fmt.Println(" - label:",w.Label()," index:",w.Index())
-	}
 
 	<-make(chan struct{})
 }

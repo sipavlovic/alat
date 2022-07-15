@@ -17,4 +17,8 @@ func ClearNode(node js.Value) {
 	node.Set("textContent","")
 }
 
+func RemoveNode(node js.Value) {
+	node.Get("parentNode").Call("removeChild",node)
+}
+
 
