@@ -18,3 +18,9 @@ func (w *Container) Draw() {
 		child.Draw()
 	}
 }
+
+func (w *Container) Remove() {
+	w.BaseParentWidget.Remove()
+	RemoveNode(w.HTMLObject())
+}
+

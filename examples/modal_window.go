@@ -9,6 +9,7 @@ import (
 
 type ModalWindow struct {
 	alat.BaseParentWidget
+	divOverlay js.Value
 	divWindow js.Value
 	divHeader js.Value
 	title string
@@ -18,6 +19,7 @@ type ModalWindow struct {
 	pos4 int
 	BackupDocumentOnMouseUp js.Value
 	BackupDocumentOnMouseMove js.Value
+	closeHandler func(*ModalWindow)
 }
 
 func NewModalWindow(block *alat.Block, title string) *ModalWindow {
@@ -27,19 +29,40 @@ func NewModalWindow(block *alat.Block, title string) *ModalWindow {
 	return &window
 }
 
+func (w *ModalWindow) SetCloseHandler(hnd func(*ModalWindow)) {
+	w.closeHandler = hnd
+}
 
-func (w *ModalWindow) Close() {
-	alat.RemoveNode(w.divWindow)
+func (w *ModalWindow) Remove() {
+	//w.BaseParentWidget.Remove()
+	//alat.RemoveNode(w.divWindow)
+	alat.RemoveNode(w.divOverlay)
 }
 
 func (w *ModalWindow) Draw() {
-	w.divWindow = alat.NewNode(w.ParentHTMLObject(),"div")
+	// Overlay
+	w.divOverlay = alat.NewNode(w.ParentHTMLObject(),"div")
+	w.divOverlay.Set("style","position:fixed;z-index:1;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:rgb(0,0,0);background-color: rgba(0,0,0,0.4);")
+	// Main window
+	w.divWindow = alat.NewNode(w.divOverlay,"div")
 	w.divWindow.Set("style","position:absolute;z-index:9;background-color:#fff;border:1px solid #888;")
 	w.divWindow.Get("style").Set("top","100px")
 	w.divWindow.Get("style").Set("left","100px")
+	// Header
 	w.divHeader = alat.NewNode(w.divWindow,"div")
 	w.divHeader.Set("style","padding:10px;cursor:move;z-index:10;background-color:#2196F3;color:#fff;")
 	w.divHeader.Set("textContent",w.title)
+	// Span X
+	spanClose := alat.NewNode(w.divHeader,"span")
+	spanClose.Set("style","color: #fff;float: right;font-size: 28px;font-weight: bold;cursor:pointer")
+	spanClose.Set("innerHTML","&times")
+	spanClose.Set("onclick",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		if w.closeHandler != nil {
+			go w.closeHandler(w)
+		}
+		return nil
+	}))
+	// Content
 	divContent := alat.NewNode(w.divWindow,"div")
 	divContent.Set("style","padding:10px;")
 	w.SetHTMLObject(divContent)

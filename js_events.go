@@ -3,7 +3,6 @@ package alat
 
 import (
 	"syscall/js"
-	"fmt"
 )
 
 
@@ -134,8 +133,8 @@ func AttachFocusEvents(widget FocusableWidget, obj js.Value, rownum int) {
 		}
 		*/
 		block := widget.Block()
-		fmt.Printf("OnFocus:%p,%d (from %p,%d)\n",widget,block.Pos(),
-			block.lastFocusOutWidget,block.lastFocusOutPos)
+		//fmt.Printf("OnFocus:%p,%d (from %p,%d)\n",widget,block.Pos(),
+		//	block.lastFocusOutWidget,block.lastFocusOutPos)
 		if widget.IsInMultiRow() {
 			buffer := block.Buffer()
 			bufferPos,_ := block.ViewRow2BufferPos(rownum)

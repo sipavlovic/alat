@@ -6,7 +6,7 @@ import (
 
 type Button struct {
 	BaseFocusableWidget
-	handler func(* Button)
+	handler func(*Button)
 }
 
 func NewButton(block *Block, parentWidget ParentWidget, label string) *Button {
@@ -23,7 +23,7 @@ func (w *Button) Draw() {
 	w.BaseFocusableWidget.Draw()
 	button.Set("onclick",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		if w.handler != nil {
-			w.handler(w)
+			go w.handler(w)
 		}
    		return nil
    	}))
@@ -35,12 +35,16 @@ func (w *Button) DrawInMultiRow(parent js.Value, rownum int) js.Value {
 	button.Set("textContent",w.Label())
 	button.Set("onclick",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		if w.handler != nil {
-			w.handler(w)
+			go w.handler(w)
 		}
    		return nil
    	}))
 	AttachFocusEvents(w,button,rownum)
 	return button
+}
+
+func (w *Button) Remove() {
+	RemoveNode(w.HTMLObject())
 }
 
 func (w *Button) SelectAll() {}

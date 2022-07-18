@@ -20,3 +20,8 @@ func (w *Label) Draw() {
 	w.BaseWidget.Draw()
 }
 
+func (w *Label) Remove() {
+	RemoveNode(w.HTMLObject())
+}
+
+

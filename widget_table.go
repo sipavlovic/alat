@@ -16,6 +16,12 @@ func NewTable(block *Block, parentWidget ParentWidget) *Table {
 	return &table
 }
 
+func (w *Table) Remove() {
+	w.BaseParentWidget.Remove()
+	RemoveNode(w.HTMLObject())
+}
+
+
 func (w *Table) Draw() {
 	div := NewNode(w.ParentHTMLObject(),"div")
 	w.htmlObject = div

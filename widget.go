@@ -14,6 +14,7 @@ type Widget interface {
 	Draw()
 	Refresh()
 	RefreshCurrentRow()
+	Remove()
 
 	IsFocusable() bool
 	IsParent() bool
@@ -70,6 +71,8 @@ func (w *BaseWidget) Draw() {}
 func (w *BaseWidget) Refresh() {}
 
 func (w *BaseWidget) RefreshCurrentRow() {}
+
+func (w *BaseWidget) Remove() {}
 
 func (w *BaseWidget) IsFocusable() bool {
 	return false

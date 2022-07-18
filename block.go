@@ -20,6 +20,7 @@ type Block struct {
 	visibleRows int
 	lastFocusOutWidget FocusableWidget
 	lastFocusOutPos int
+	ch chan string
 }
 
 func NewBlock(mainHtmlObject js.Value, visibleRows int) *Block {
@@ -32,7 +33,16 @@ func NewBlock(mainHtmlObject js.Value, visibleRows int) *Block {
 	block.focusIndexed = make(map[FocusableWidget]int)
 	block.currentWidget = nil
 	block.visibleRows = visibleRows
+	block.ch = make(chan string)
 	return &block
+}
+
+func (b *Block) Wait() string {
+	return <-b.ch
+}
+
+func (b *Block) Send(msg string) {
+	b.ch <- msg
 }
 
 func (b *Block) Buffer() *Buffer {
@@ -65,6 +75,13 @@ func (b *Block) RefreshCurrentRow() {
 	for _,widget := range b.widgets {
 		widget.RefreshCurrentRow()
 	}
+}
+
+func (b *Block) Close(msg string) {
+	for _,widget := range b.widgets {
+		widget.Remove()
+	}
+	b.Send(msg)
 }
 
 

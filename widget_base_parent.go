@@ -46,6 +46,10 @@ func (w *BaseParentWidget) RefreshCurrentRow() {
 	}
 }
 
-
+func (w *BaseParentWidget) Remove() {
+	for _, child := range w.children {
+		child.Remove()
+	}
+}
 
 

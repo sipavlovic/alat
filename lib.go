@@ -18,7 +18,9 @@ func ClearNode(node js.Value) {
 }
 
 func RemoveNode(node js.Value) {
-	node.Get("parentNode").Call("removeChild",node)
+	if !node.IsNull() && !node.IsUndefined() {
+		node.Get("parentNode").Call("removeChild",node)
+	}
 }
 
 

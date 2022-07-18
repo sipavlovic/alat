@@ -14,8 +14,9 @@ import (
 )
 
 const (
-	version = "2022-07-15"
+	version = "2022-07-18"
 )
+
 
 func MakeCSS() {
 	head := js.Global().Get("document").Get("head")
@@ -69,6 +70,9 @@ func (w *NewLineWidget) Draw() {
 	w.BaseWidget.Draw()
 }
 
+func (w *NewLineWidget) Remove() {
+	alat.RemoveNode(w.HTMLObject())
+}
 
 
 
@@ -83,7 +87,7 @@ func (w *NewLineWidget) Draw() {
 
 // ====================================================================================
 
-func NewMainBlock() *alat.Block {
+func CallMainBlock() string {
 
 	block := alat.NewBlock(alat.HTMLBody,10)
 	container := alat.NewContainer(block,nil) 
@@ -112,10 +116,8 @@ func NewMainBlock() *alat.Block {
 	
 	butt := alat.NewButton(block,container,"Open modal window!")
 	butt.SetHandler(func(w *alat.Button) {
-		//alat.HTMLWindow.Call("alert","Clicked!")
-		newblock := NewSubBlock()
-		newblock.Draw()
-		newblock.Refresh()
+		msg := CallSubBlock()
+		fmt.Println("Msg from Sub:",msg)
 		fmt.Println("EXIT BUTTON CLICK ON MAIN BLOCK!!!")
 	})
 
@@ -145,8 +147,12 @@ func NewMainBlock() *alat.Block {
 		buff.Set("SIX","Six-"+FromInt(i))
 	}
 
-	return block
+	block.Draw()
+	block.Refresh()
 
+	fmt.Println("End defining main block.")
+
+	return block.Wait()
 }
 
 
@@ -159,12 +165,12 @@ func NewMainBlock() *alat.Block {
 
 // ==================================================================================
 
-func NewSubBlock() *alat.Block {
+func CallSubBlock() string {
 
 	block := alat.NewBlock(alat.HTMLBody,5)
 	modal := NewModalWindow(block,"Modal Window")
 
-	alat.NewLabel(block,modal,"Sorry, still not modal...")
+	alat.NewLabel(block,modal,"Some important messages...")
 	NewLine(block,modal)
 	table := alat.NewTable(block,modal)
 	col_one := alat.NewEdit(block,table,"One")
@@ -174,10 +180,21 @@ func NewSubBlock() *alat.Block {
 	col_five := alat.NewEdit(block,table,"Five")
 	col_six := alat.NewEdit(block,table,"Six")
 	NewLine(block,modal)
+
 	butt := alat.NewButton(block,modal,"Close")
 	butt.SetHandler(func(w *alat.Button) {
-		modal.Close()
+		block.Close("Closing sub block (from button), bro!")
 	})
+	modal.SetCloseHandler(func(w *ModalWindow) {
+		block.Close("Closing sub block (from X on window), bro!")
+	})
+
+	butt2 := alat.NewButton(block,modal,"New window")
+	butt2.SetHandler(func(w *alat.Button) {
+		msg := CallSubBlock()
+		fmt.Println("Msg from Sub:",msg)
+	})
+
 
 	block.Connect(col_one,"ONE")
 	block.Connect(col_two,"TWO")
@@ -198,7 +215,12 @@ func NewSubBlock() *alat.Block {
 		buff.Set("SIX","Six-"+FromInt(i))
 	}
 
-	return block
+	block.Draw()
+	block.Refresh()
+
+	fmt.Println("End defining sub block.")
+
+	return block.Wait()
 
 }
 
@@ -206,18 +228,16 @@ func NewSubBlock() *alat.Block {
 
 
 
-
-
-
-// ==================================================================================
+// -----------------------------------------------
 
 func main() {
 
 	MakeCSS()
 
-	block := NewMainBlock()
-	block.Draw()
-	block.Refresh()
+	msg := CallMainBlock()
+	fmt.Println("Msg from Main:",msg)
+
+	fmt.Println("THE END")
 
 	<-make(chan struct{})
 }

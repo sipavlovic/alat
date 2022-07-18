@@ -9,6 +9,8 @@ import (
 
 type Edit struct {
 	BaseFocusableWidget
+	divLabel js.Value
+	divInput js.Value
 }
 
 func NewEdit(block *Block, parentWidget ParentWidget, label string) *Edit {
@@ -18,10 +20,10 @@ func NewEdit(block *Block, parentWidget ParentWidget, label string) *Edit {
 }
 
 func (w *Edit) Draw() {
-	divLabel := NewNode(w.ParentHTMLObject(),"div")
-	divLabel.Set("textContent",w.Label())
-	divInput := NewNode(w.ParentHTMLObject(),"div")
-	input := NewNode(divInput,"input")
+	w.divLabel = NewNode(w.ParentHTMLObject(),"div")
+	w.divLabel.Set("textContent",w.Label())
+	w.divInput = NewNode(w.ParentHTMLObject(),"div")
+	input := NewNode(w.divInput,"input")
 	w.htmlObject = input
 	w.BaseFocusableWidget.Draw()
 	AttachFocusEvents(w,input,NOTINTABLE)
@@ -31,6 +33,12 @@ func (w *Edit) DrawInMultiRow(parent js.Value, rownum int) js.Value {
 	input := NewNode(parent,"input")
 	AttachFocusEvents(w,input,rownum)
 	return input
+}
+
+func (w *Edit) Remove() {
+	RemoveNode(w.HTMLObject())
+	RemoveNode(w.divLabel)
+	RemoveNode(w.divInput)
 }
 
 func (w *Edit) Refresh() {

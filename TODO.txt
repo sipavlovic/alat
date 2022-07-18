@@ -9,9 +9,7 @@
 *) Single Fields (variable,stadalone), Multi Fields (row fields) in buffer
 *) Buttons need to connect to field and reacts to OnActionField as Onclick
 *) All connections should be made within widget constructors (buffer fields defined before)
-*) Problem with modal windows: not modal
-*) Problem with modal windows: does not wait for sub block exit on main button event
-
+    
 ========
   DONE 
 ========
@@ -54,6 +52,9 @@
    label edit pair standalone, label button. or column label in table
 2022-07-14) BUG: when keyboard movement source row is copied to target row
 2022-07-15) Define ModalWindow container widget, draggable
+2022-07-18) Problem with modal windows: does not wait for sub block exit on main button event
+   make Block.Close() and widget.Remove(). Channel in block close and appropriate Block.Wait()
+2022-07-18) Problem with modal windows: not modal yet :-)
 
 
 
