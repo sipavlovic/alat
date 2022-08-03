@@ -7,6 +7,7 @@ import (
 
 
 func AttachFocusEvents(widget FocusableWidget, obj js.Value, rownum int) {
+	
 	obj.Set("onkeydown",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		event := args[0]
 		keycode := event.Get("keyCode").Int()
@@ -118,20 +119,15 @@ func AttachFocusEvents(widget FocusableWidget, obj js.Value, rownum int) {
 		}
    		return nil
    	}))
+
 	/*
 	obj.Set("onmousedown",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		fmt.Printf("OnClick:%p,%d\n",widget,rownum)
 		return nil
 	}))
 	*/
+
     obj.Set("onfocus",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		/* naive test - failed
-		if rownum == 0 {
-			event := args[0]
-			event.Call("preventDefault")
-			return nil
-		}
-		*/
 		block := widget.Block()
 		//fmt.Printf("OnFocus:%p,%d (from %p,%d)\n",widget,block.Pos(),
 		//	block.lastFocusOutWidget,block.lastFocusOutPos)
@@ -149,6 +145,7 @@ func AttachFocusEvents(widget FocusableWidget, obj js.Value, rownum int) {
 		widget.SelectAll()
    		return nil
    	}))
+
 	obj.Call("addEventListener","focusout",js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		block := widget.Block()
 		//fmt.Printf("OnFocusOut:%p,%d\n",widget,block.Pos())

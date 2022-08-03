@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	version = "2022-07-18"
+	version = "2022-08-03"
 )
 
 
@@ -121,9 +121,19 @@ func CallMainBlock() string {
 		fmt.Println("EXIT BUTTON CLICK ON MAIN BLOCK!!!")
 	})
 
+	alat.NewBlockField(block,"USERNAME")
+	alat.NewRowField(block,"PASSWORD")
+
 	block.Connect(w_usr,"USERNAME")
 	block.Connect(w_pwd,"PASSWORD")
 	block.Connect(w_pwd2,"PASSWORD")
+
+	alat.NewRowField(block,"ONE")
+	alat.NewRowField(block,"TWO")
+	alat.NewRowField(block,"THREE")
+	alat.NewRowField(block,"FOUR")
+	alat.NewRowField(block,"FIVE")
+	alat.NewRowField(block,"SIX")
 	
 	block.Connect(col_one,"ONE")
 	block.Connect(col_one2,"ONE")
@@ -134,17 +144,18 @@ func CallMainBlock() string {
 	block.Connect(col_six,"SIX")
 		
 	buff := block.Buffer()
+	for _,field := range buff.Fields() {
+		if !field.IsRowField() {
+			buff.Set(field.Name(),field.Name()+"-Block")
+		}
+	}
 	for i:=1;i<=50;i++ {
 		buff.InsertRow()
-		buff.Set("ID",FromInt(i))
-		buff.Set("USERNAME","User-"+FromInt(i))
-		buff.Set("PASSWORD","Pwd-"+FromInt(i))
-		buff.Set("ONE","One-"+FromInt(i))
-		buff.Set("TWO","Two-"+FromInt(i))
-		buff.Set("THREE","Three-"+FromInt(i))
-		buff.Set("FOUR","Four-"+FromInt(i))
-		buff.Set("FIVE","Five-"+FromInt(i))
-		buff.Set("SIX","Six-"+FromInt(i))
+		for _,field := range buff.Fields() {
+			if field.IsRowField() {
+				buff.Set(field.Name(),field.Name()+"-"+FromInt(i))
+			}
+		}
 	}
 
 	block.Draw()
@@ -168,7 +179,7 @@ func CallMainBlock() string {
 func CallSubBlock() string {
 
 	block := alat.NewBlock(alat.HTMLBody,5)
-	modal := NewModalWindow(block,"Modal Window")
+	modal := alat.NewModalWindow(block,"Modal Window")
 
 	alat.NewLabel(block,modal,"Some important messages...")
 	NewLine(block,modal)
@@ -185,7 +196,7 @@ func CallSubBlock() string {
 	butt.SetHandler(func(w *alat.Button) {
 		block.Close("Closing sub block (from button), bro!")
 	})
-	modal.SetCloseHandler(func(w *ModalWindow) {
+	modal.SetCloseHandler(func(w *alat.ModalWindow) {
 		block.Close("Closing sub block (from X on window), bro!")
 	})
 
@@ -195,6 +206,12 @@ func CallSubBlock() string {
 		fmt.Println("Msg from Sub:",msg)
 	})
 
+	alat.NewRowField(block,"ONE")
+	alat.NewRowField(block,"TWO")
+	alat.NewRowField(block,"THREE")
+	alat.NewRowField(block,"FOUR")
+	alat.NewRowField(block,"FIVE")
+	alat.NewRowField(block,"SIX")
 
 	block.Connect(col_one,"ONE")
 	block.Connect(col_two,"TWO")
@@ -206,13 +223,9 @@ func CallSubBlock() string {
 	buff := block.Buffer()
 	for i:=1;i<=100;i++ {
 		buff.InsertRow()
-		buff.Set("ID",FromInt(i))
-		buff.Set("ONE","One-"+FromInt(i))
-		buff.Set("TWO","Two-"+FromInt(i))
-		buff.Set("THREE","Three-"+FromInt(i))
-		buff.Set("FOUR","Four-"+FromInt(i))
-		buff.Set("FIVE","Five-"+FromInt(i))
-		buff.Set("SIX","Six-"+FromInt(i))
+		for _,field := range buff.Fields() {
+			buff.Set(field.Name(),field.Name()+"-"+FromInt(i))
+		}
 	}
 
 	block.Draw()

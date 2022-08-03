@@ -5,10 +5,10 @@
 
 *) Create Block.GotoRequest(widget,bufferPos) bool
   - only place for Goto, SetFocus and Refresh calls
-*) Events: OnExitField, OnActionField, OnEnterRow, OnExitRow, OnEnterBlock, OnExitBlock
-*) Single Fields (variable,stadalone), Multi Fields (row fields) in buffer
+*) Events: OnChangeField, OnExitField, OnActionField, OnEnterRow, OnExitRow, OnEnterBlock, OnExitBlock
 *) Buttons need to connect to field and reacts to OnActionField as Onclick
 *) All connections should be made within widget constructors (buffer fields defined before)
+
     
 ========
   DONE 
@@ -56,7 +56,8 @@
    make Block.Close() and widget.Remove(). Channel in block close and appropriate Block.Wait()
 2022-07-18) Problem with modal windows: not modal yet :-)
 
-
+2022-07-27) Modal Window as standard widget
+2022-08-03) Introduce block and row fields in buffer
 
 =========
   IDEAS

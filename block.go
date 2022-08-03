@@ -18,9 +18,10 @@ type Block struct {
 	viewBegin int
 	viewEnd int
 	visibleRows int
+	ch chan string
+
 	lastFocusOutWidget FocusableWidget
 	lastFocusOutPos int
-	ch chan string
 }
 
 func NewBlock(mainHtmlObject js.Value, visibleRows int) *Block {
@@ -50,6 +51,10 @@ func (b *Block) Buffer() *Buffer {
 }
 
 func (b *Block) Connect(widget FocusableWidget, column string) {
+	_,err := b.buffer.Field(column)
+	if err != nil {
+		panic(err)
+	}
 	b.columnsToWidgets[column] = widget
 	b.widgetsToColumns[widget] = column
 }
